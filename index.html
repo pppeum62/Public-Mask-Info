@@ -107,10 +107,24 @@
                 };
             }
 
-            var urlString = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=35.56987712473425&lng=126.85600564905116&m=2000";
+            var default_lat = 35.5698504;
+            var default_lng = 126.8538471;
+            var lat = default_lat;
+            var lng = default_lng;
+            var urlString = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat="+lat+"&lng="+lng+"&m=2000";
             httpGetAsync(urlString, requestAPI);
 
             var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-        </script>
+
+            // 지도가 이동, 확대, 축소로 인해 중심좌표가 변경되면 마지막 파라미터로 넘어온 함수를 호출하도록 이벤트를 등록합니다
+            kakao.maps.event.addListener(map, 'center_changed', function() {
+            var latlng = map.getCenter();   // 지도의 중심좌표를 얻어옵니다 
+            lat = latlng.getLat();
+            lng = latlng.getLng();
+            urlString = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat="+lat+"&lng="+lng+"&m=2000";
+            httpGetAsync(urlString, requestAPI);
+
+            });
+            </script>
     </body>
 </html>
