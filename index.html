@@ -44,8 +44,8 @@
             </ul>
             <div class="search-warp">
                 <div class="search">
-                    <input type="text" class="place" placeholder="장소를 검색하세요">
-                    <button class="search-btn">
+                    <input type="text" id="search" class="place" onkeyup="enterkey();" placeholder="장소를 검색하세요">
+                    <button class="search-btn" onclick="buttonPress();">
                         <img src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgNTExLjk5OSA1MTEuOTk5IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MTEuOTk5IDUxMS45OTk7IiB4bWw6c3BhY2U9InByZXNlcnZlIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiI+PGc+PGc+Cgk8Zz4KCQk8cGF0aCBkPSJNNTA4Ljg3NCw0NzguNzA4TDM2MC4xNDIsMzI5Ljk3NmMyOC4yMS0zNC44MjcsNDUuMTkxLTc5LjEwMyw0NS4xOTEtMTI3LjMwOWMwLTExMS43NS05MC45MTctMjAyLjY2Ny0yMDIuNjY3LTIwMi42NjcgICAgUzAsOTAuOTE3LDAsMjAyLjY2N3M5MC45MTcsMjAyLjY2NywyMDIuNjY3LDIwMi42NjdjNDguMjA2LDAsOTIuNDgyLTE2Ljk4MiwxMjcuMzA5LTQ1LjE5MWwxNDguNzMyLDE0OC43MzIgICAgYzQuMTY3LDQuMTY1LDEwLjkxOSw0LjE2NSwxNS4wODYsMGwxNS4wODEtMTUuMDgyQzUxMy4wNCw0ODkuNjI3LDUxMy4wNCw0ODIuODczLDUwOC44NzQsNDc4LjcwOHogTTIwMi42NjcsMzYyLjY2NyAgICBjLTg4LjIyOSwwLTE2MC03MS43NzEtMTYwLTE2MHM3MS43NzEtMTYwLDE2MC0xNjBzMTYwLDcxLjc3MSwxNjAsMTYwUzI5MC44OTYsMzYyLjY2NywyMDIuNjY3LDM2Mi42Njd6IiBkYXRhLW9yaWdpbmFsPSIjMDAwMDAwIiBjbGFzcz0iYWN0aXZlLXBhdGgiIHN0eWxlPSJmaWxsOiM5MDkwOTAiIGRhdGEtb2xkX2NvbG9yPSIjMDAwMDAwIj48L3BhdGg+Cgk8L2c+CjwvZz48L2c+IDwvc3ZnPg=='>
                     </button>
                 </div>
@@ -166,6 +166,69 @@
                 return function() {
                     infowindow.close();
                 };
+            }
+
+            // 엔터가 눌렸을 때 실행되는 함수입니다
+            function enterkey() {
+                if (window.event.keyCode == 13) {
+                    // 장소를 검색합니다
+                    searchPlace();
+                }
+            }
+
+            // 검색 버튼이 눌렸을 때 실행되는 함수입니다
+            function buttonPress() {
+                // 장소를 검색합니다
+                searchPlace();
+            }
+
+            // 장소 검색 객체를 생성합니다
+            var ps = new kakao.maps.services.Places();
+
+            // 검색을 요청하는 함수입니다
+            function searchPlace() {
+                var keyword = document.getElementById('search').value;
+
+                // 검색어를 입력하지 않고 엔터나 검색 버튼을 눌렀을 때 실행
+                if(!keyword.trim()) {
+                    alert('검색어를 입력해주세요!');
+
+                    return false;
+                }
+
+                // 장소 검색 객체를 통해 장소 검색을 요청합니다
+                ps.keywordSearch(keyword, placeSearchCB);
+            }
+
+            // 장소 검색이 완료되었을 때 호출되는 콜백함수입니다
+            function placeSearchCB(data, status, pagination) {
+                if(status === kakao.maps.services.Status.OK) {
+                    // 정상적으로 검색이 완료 됐으면 검색 목록을 반환합니다
+                    PlacesData(data);
+                } else if(status === kakao.maps.services.Status.ZERO_RESULT) {
+                    alert('검색 결과가 존재하지 않습니다.');
+
+                    return;
+                } else if(status === kakao.maps.services.Status.ERROR) {
+                    alert('검색 중 오류가 발생했습니다.');
+
+                    return;
+                }
+            }
+
+            // 검색 결과 목록을 나타내는 함수입니다
+            function PlacesData(places) {
+                var bounds = new kakao.maps.LatLngBounds();
+                var placePosition = new kakao.maps.LatLng(places[0].y, places[0].x);
+
+                // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기 위해 LatLngBounds 객체에 좌표를 추가
+                bounds.extend(placePosition);
+
+                for(var i = 0; i < places.length; i++) {
+                    console.log(places[i]);
+                }
+
+                map.setBounds(bounds);
             }
 
             var default_lat = latitude;
