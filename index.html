@@ -9,13 +9,26 @@
         <div id="map" style="width:500px; height:400px;"></div>
         <script>
             var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+            
+            // 정읍 시청의 좌표
+            var latitude = 35.5698504;      // 위도
+            var longitude = 126.8538471;    // 경도
+
+            // geolocation을 사용할 수 있는지 확인합니다.
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {   // geolocation을 이용해서 접속 위치를 얻어옵니다.
+                    latitude = position.coords.latitude;
+                    longitude = position.coords.longitude;
+
+                    var locPosition = new kakao.maps.LatLng(latitude, longitude);
+                    map.setCenter(locPosition);
+                });
+            } else {
+                console.log("geolocaion을 사용할 수 없습니다.");
+            }
+
             var options = { //지도를 생성할 때 필요한 기본 옵션
-                /*
-                정읍시청 기준의 정보
-                좌표 35.5698504,126.8538471
-                공적 마스크 정보 https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=35.56987712473425&lng=126.85600564905116&m=2000
-                */
-                center: new kakao.maps.LatLng(35.5697816,126.8562074), //지도의 중심좌표.
+                center: new kakao.maps.LatLng(latitude, longitude), //지도의 중심좌표.
                 level: 3 //지도의 레벨(확대, 축소 정도)
             };
 
